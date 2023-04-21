@@ -1,4 +1,5 @@
 import Greeter from './Greeter'
+import Wordle from './Wordle'
 
 export function App() {
     return (
@@ -8,6 +9,7 @@ export function App() {
             </header>
             <main>
                 <Greeter />
+                <Wordle />
             </main>
         </>
     )

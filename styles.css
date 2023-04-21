@@ -34,3 +34,9 @@ form button span {
     min-width: 300px;
     padding: 1em 0;
 }
+#wordle-results {
+    display: none;
+}
+#wordle-results.winning {
+    display: block;
+}
