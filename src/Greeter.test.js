@@ -8,9 +8,9 @@ import Greeter from './Greeter'
 const user = userEvent.setup()
 
 describe('Greeter', () => {
-    xit('renders', () => {
+    it('renders', () => {
         render(<Greeter />)
-        // const example = screen.getByTestId('editable-handle')
-        // expect(example).toBeInTheDocument()
+        const example = screen.getByTestId('greeter')
+        expect(example).toBeInTheDocument()
     })
 })
