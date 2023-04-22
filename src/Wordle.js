@@ -1,37 +1,90 @@
-import React, {useState} from 'react'
+import React, {forwardRef, useRef, useState} from 'react'
+
+import './wordle.css'
 
 /*
 EARTH
 ⬜🟩🟨🟨🟨
 */
 
+const Cell = forwardRef(({index, state}, ref) => {
+    return (
+        <input
+            aria-label={`letter ${index}`}
+            className="cell"
+            data-answer={state}
+            maxLength="1"
+            pattern="[A-Za-z]{1}"
+            ref={ref}
+            type="text"
+        />
+    )
+})
 const Wordle = () => {
     const wordOfTheDay = 'earth'
-    const [winning, setIsWinning] = useState(false)
+    const wordMaxLength = wordOfTheDay.length
+    const wordArray = wordOfTheDay.split('')
+    const [userArray, setUserArray] = useState([])
+    const cells = useRef([])
 
+    const submitHandler = (event) => {
+        event.preventDefault()
+    }
     const changeHandler = (event) => {
-        const userInput = Array.from(event.target.value)
+        // if less than the max number of characters, accept the value
+        if (userArray.length <= wordMaxLength) {
+            const userInput = event.target.value.toLowerCase()
+            const cellIndex = cells.current.indexOf(event.target)
 
-        if (userInput.length === 5) {
-            userInput.forEach((letter, index) => {
-                if (wordOfTheDay.indexOf(letter) !== -1) {
-                    setIsWinning(true)
+            setUserArray(userArray => [...userArray, userInput])
+
+            const letterPosition = wordOfTheDay.indexOf(userInput)
+            if (letterPosition === -1 ) {
+                // if cell is not in array:
+                // - state=incorrect
+                console.log('answer is incorrect')
+            } else {
+                // if cell value is in array:
+                if (letterPosition === cellIndex) {
+                    // - in correct position, state=correct
+                    console.log('answer is correct')
                 } else {
-                    setIsWinning(false)
+                    // - in wrong position, state=partial
+                    console.log('answer is partially correct')
                 }
-            })
+            }
+            // if currently focused element is within bounds, move ahead
+            if (document.activeElement !== cells.current[wordMaxLength - 1]) {
+                cells.current[cellIndex + 1].focus()
+            }
         }
     }
+
     return (
         <>  
             <h2>Wordle</h2>
-            <p>(in progress)</p>
-            <div onChange={changeHandler}>
-                <input type="text" aria-label="Type a word" />
-            </div>
-            <div id="wordle-results" className={winning ? 'winning' : null}>
-            🟩🟩🟩🟩🟩
-            </div>
+            <form
+                className="wordle"
+                onChange={changeHandler}
+                onSubmit={submitHandler}
+            >
+                <fieldset>
+                    <legend>Type in a word.</legend>
+                    { wordArray.map((l, i) => {
+                        return (
+                            // TODO: implement readonly after filling
+                            // disable shift tab
+                            <Cell
+                                key={`l${i}`}
+                                index={i}
+                                ref={(ref) => cells.current.push(ref)}
+                                state={''}
+                            />
+                        )
+                    })}
+                    </fieldset>
+                <button><span>Submit</span></button>
+            </form>
         </>
     )
 }

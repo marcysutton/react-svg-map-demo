@@ -14,7 +14,7 @@ const Greeter = () => {
 
     return (
         <div data-testid="greeter">
-            <form onSubmit={submitHandler}>
+            <form className="greeter" onSubmit={submitHandler}>
                 <label>
                     Enter your message<br />
                     <input type="text" ref={inputRef} />

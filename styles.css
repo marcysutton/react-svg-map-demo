@@ -9,7 +9,7 @@ body {
     font-family: sans-serif;
 }
 
-form input[type="text"] {
+form.greeter input[type="text"] {
     display: block;
     font-size: 1.25rem;
     margin: 0.5em 0;
@@ -33,10 +33,4 @@ form button span {
     margin: 1em 0;
     min-width: 300px;
     padding: 1em 0;
-}
-#wordle-results {
-    display: none;
-}
-#wordle-results.winning {
-    display: block;
 }
