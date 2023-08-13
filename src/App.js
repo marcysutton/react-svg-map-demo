@@ -1,15 +1,13 @@
-import Greeter from './Greeter'
-import Wordle from './Wordle'
+import SVGMap from './SVGMap'
 
 export function App() {
     return (
         <>
             <header>
-                <h1>hello world!</h1>
+                <h1>SVG Map Demo</h1>
             </header>
             <main>
-                <Greeter />
-                <Wordle />
+                <SVGMap />
             </main>
         </>
     )

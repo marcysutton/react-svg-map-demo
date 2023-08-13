@@ -8,29 +8,10 @@ body {
     color: purple;
     font-family: sans-serif;
 }
-
-form.greeter input[type="text"] {
-    display: block;
-    font-size: 1.25rem;
-    margin: 0.5em 0;
+header {
+    text-align: center;
 }
-form button {
-    background-color: currentColor;
-    border: none;
-    color: currentColor;
-    font-size: 1rem;
-    padding: 0.5em 1em;
-    -webkit-appearance: none;
-}
-form button span {
-    filter: invert(100%);
-}
-#results {
-    border: 2px solid currentColor;
-    border-width: 2px 0 0 0;
-    display: inline-block;
-    font-size: 1.25rem;
-    margin: 1em 0;
-    min-width: 300px;
-    padding: 1em 0;
+main {
+    margin: 0 auto;
+    max-width: 640px;
 }
