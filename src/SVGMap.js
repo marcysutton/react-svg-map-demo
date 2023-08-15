@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from 'react'
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 
 const SVGMap = () => {
     const svgRef = useRef(null)
@@ -6,24 +6,35 @@ const SVGMap = () => {
     const [cellActiveIndex, setCellActiveIndex] = useState(0)
     const [cellRects, setCellRects] = useState([])
 
+    useEffect(() => {
+        cellRefs.current[cellActiveIndex].focus()
+    }, [cellActiveIndex])
+
     useLayoutEffect(() => {
         // make sure DOM APIs are consistently available through useLayoutEffect hook
-        setCellRects(cellRefs.current.map((btn, i) => btn.getBoundingClientRect()))
+        setCellRects(cellRefs.current.map((btn, i) => getBoundingBox(btn)))
     }, [])
 
     const KEY_DIRECTION = {
         UP: 'ArrowUp', RIGHT: 'ArrowRight', DOWN: 'ArrowDown', LEFT: 'ArrowLeft'
     }
-    
-    const focusHandler = (event) => {
-        if (event.target.dataset.cellId) {
-            activateBtn(event.target.dataset.cellId)
+    const getBoundingBox = (element) => {
+        const box = element.getBoundingClientRect()
+        const rect = {}
+
+        for (const prop in box) {
+          rect[prop] = box[prop]
         }
-    }
+      
+        rect.xCenter = Math.floor((box.left + box.right) / 2)
+        rect.yCenter = Math.floor((box.top + box.bottom) / 2)
+      
+        return rect
+      }
     const blurHandler = (event) => {
         // reset when leaving the buttons
         if (!svgRef.current.contains(event.target)) {
-            resetBtns()
+            setCellActiveIndex(null)
         }
     }
     const keyHandler = (event) => {
@@ -48,40 +59,50 @@ const SVGMap = () => {
     }
     const distance = (rect1, rect2) => {
         let result = Math.sqrt(Math.pow(rect1.x - rect2.x, 2) + Math.pow(rect1.y - rect2.y, 2))
-        console.log('distance', result)
         return result
+    }
+    const outOfBounds = (direction, targetRect, otherRect, i) => {
+        let excluded = false
+        switch (direction) {
+            // bail out if element is out of bounds
+            case KEY_DIRECTION.LEFT:
+                if (otherRect.xCenter >= targetRect.xCenter) excluded = true
+            break
+            case KEY_DIRECTION.UP:
+                if (otherRect.yCenter >= targetRect.yCenter) excluded = true
+            break
+            case KEY_DIRECTION.RIGHT:
+                if (otherRect.xCenter <= targetRect.xCenter) excluded = true
+            break
+            case KEY_DIRECTION.DOWN:
+                if(otherRect.yCenter <= targetRect.yCenter) excluded = true
+            break
+        }
+        return excluded
     }
     const findClosestNeighbor = (target, direction) => {
         const targetIndex = Number(target.dataset.cellId)
-
-        console.log(cellRects)
         const targetRect = cellRects && cellRects[targetIndex]
 
         let closestRect
         let minDistance = 10000000
         for (var i = 0; i < cellRects.length; i++) {
             let rect = cellRects[i]
+            let excluded = outOfBounds(direction, targetRect, rect, i) || (i === targetIndex)
             let d = distance(targetRect, rect)
-            if (d < minDistance) {
-                minDistance = d;
-                setCellActiveIndex(i);
-                closestRect = rect;
+            if (!excluded) {
+                if (d < minDistance) {
+                    minDistance = d;
+                    setCellActiveIndex(i);
+                    closestRect = rect;
+                }
             }
         }
-        activateBtn(cellActiveIndex)
-        cellRefs.current[cellActiveIndex].focus()
-    }
-    const activateBtn = (nodeId) => {
-        setCellActiveIndex(nodeId)
-    }
-    const resetBtns = () => {
-        setCellActiveIndex(null)
     }
     return (
         <div className="svg-wrapper">  
             <svg
                 aria-roledescription="Math controls"
-                onFocus={focusHandler}
                 onBlur={blurHandler}
                 onKeyDown={keyHandler}
                 ref={svgRef}
